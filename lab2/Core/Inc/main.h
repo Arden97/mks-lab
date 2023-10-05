@@ -45,7 +45,9 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+extern volatile uint32_t Tick;
+void blikac(void);
+void tlacitka(void);
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
