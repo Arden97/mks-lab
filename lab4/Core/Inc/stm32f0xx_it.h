@@ -1,9 +1,8 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
+  * @file    stm32f0xx_it.h
+  * @brief   This file contains the headers of the interrupt handlers.
   ******************************************************************************
   * @attention
   *
@@ -14,20 +13,17 @@
   * in the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
-  ******************************************************************************
+ ******************************************************************************
   */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H
-#define __MAIN_H
+#ifndef __STM32F0xx_IT_H
+#define __STM32F0xx_IT_H
 
 #ifdef __cplusplus
-extern "C" {
+ extern "C" {
 #endif
-
-/* Includes ------------------------------------------------------------------*/
-#include "stm32f0xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -50,44 +46,18 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
-void Error_Handler(void);
-
+void NMI_Handler(void);
+void HardFault_Handler(void);
+void SVC_Handler(void);
+void PendSV_Handler(void);
+void SysTick_Handler(void);
+void ADC1_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
-
-/* Private defines -----------------------------------------------------------*/
-#define B1_Pin GPIO_PIN_13
-#define B1_GPIO_Port GPIOC
-#define S2_Pin GPIO_PIN_0
-#define S2_GPIO_Port GPIOC
-#define S1_Pin GPIO_PIN_1
-#define S1_GPIO_Port GPIOC
-#define USART_TX_Pin GPIO_PIN_2
-#define USART_TX_GPIO_Port GPIOA
-#define USART_RX_Pin GPIO_PIN_3
-#define USART_RX_GPIO_Port GPIOA
-#define LD2_Pin GPIO_PIN_5
-#define LD2_GPIO_Port GPIOA
-#define SCT_NOE_Pin GPIO_PIN_10
-#define SCT_NOE_GPIO_Port GPIOB
-#define TMS_Pin GPIO_PIN_13
-#define TMS_GPIO_Port GPIOA
-#define TCK_Pin GPIO_PIN_14
-#define TCK_GPIO_Port GPIOA
-#define SCT_CLK_Pin GPIO_PIN_3
-#define SCT_CLK_GPIO_Port GPIOB
-#define SCT_SDI_Pin GPIO_PIN_4
-#define SCT_SDI_GPIO_Port GPIOB
-#define SCT_NLA_Pin GPIO_PIN_5
-#define SCT_NLA_GPIO_Port GPIOB
-
-/* USER CODE BEGIN Private defines */
-
-/* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __MAIN_H */
+#endif /* __STM32F0xx_IT_H */
