@@ -75,7 +75,8 @@ void Error_Handler(void);
 #define TCK_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
-
+static int32_t platform_write(void *handle, uint8_t reg, uint8_t *bufp, uint16_t len);
+static int32_t platform_read(void *handle, uint8_t reg, uint8_t *bufp, uint16_t len);
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
