@@ -45,7 +45,8 @@ TIM_HandleTypeDef htim1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-
+static volatile uint16_t actual_val = 0;
+static volatile uint16_t start = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -96,6 +97,7 @@ int main(void)
   sct_init();
   sct_led(0x7A5C36DE);
   HAL_Delay(1000);
+  static enum {START, STOP, RESET} state = STOP;
 
   HAL_TIM_Encoder_Start(&htim1, htim1.Channel);
   /* USER CODE END 2 */
@@ -107,11 +109,42 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	 /*for(uint32_t i=0; i<999; i+=111){
+	/*for(uint32_t i=0; i<999; i+=111){
 		 sct_value(i);
-	 }*/
-	sct_value(__HAL_TIM_GET_COUNTER(&htim1));
-	HAL_Delay(50);
+		 HAL_Delay(1000);
+	}*/
+	/*sct_value(__HAL_TIM_GET_COUNTER(&htim1));
+	 *
+	 */
+	  	 if (!HAL_GPIO_ReadPin(S1_GPIO_Port, S1_Pin)){
+			 actual_val = 0;
+			 state = RESET;
+		 }
+		 if (!HAL_GPIO_ReadPin(S2_GPIO_Port, S2_Pin)){
+			 if (state == STOP || state == RESET){
+				 state = START;
+			 }
+			 else {
+				 state = STOP;
+			 }
+		 }
+
+		 switch(state){
+		 	 case START:
+				 sct_value(actual_val++);
+				 HAL_Delay(1000);
+				 if (actual_val == 999){
+					 actual_val = 0;
+				 }
+				 break;
+		 	 case STOP:
+				 sct_value(actual_val);
+				 HAL_Delay(1000);
+				 break;
+		 	 case RESET:
+				 sct_init();
+				 break;
+		 }
   }
   /* USER CODE END 3 */
 }
@@ -257,9 +290,6 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, S2_Pin|S1_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
@@ -273,9 +303,8 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : S2_Pin S1_Pin */
   GPIO_InitStruct.Pin = S2_Pin|S1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LD2_Pin */
