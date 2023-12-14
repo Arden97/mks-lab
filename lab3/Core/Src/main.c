@@ -116,6 +116,10 @@ int main(void)
 	/*sct_value(__HAL_TIM_GET_COUNTER(&htim1));
 	 *
 	 */
+
+
+
+
 	  	 if (!HAL_GPIO_ReadPin(S1_GPIO_Port, S1_Pin)){
 			 actual_val = 0;
 			 state = RESET;
