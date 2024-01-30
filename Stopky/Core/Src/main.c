@@ -51,7 +51,10 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+uint8_t s1_state_change(uint8_t);
+uint8_t s2_state_change(uint8_t);
+uint8_t s1_is_released(uint8_t);
+uint8_t s2_is_released(uint8_t);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -98,11 +101,10 @@ int main(void)
   uint8_t seconds = 0;
   static uint32_t last_task_time = 0;
   uint8_t timer_started = 0;
-  uint32_t s1_push_time = 0;
-  uint32_t s1_state = HAL_GPIO_ReadPin(S1_GPIO_Port, S1_Pin);
-  uint32_t s2_state = HAL_GPIO_ReadPin(S2_GPIO_Port, S2_Pin);
-
-  uint32_t s2_push_time = 0;
+  uint8_t s1_push_time = 0;
+  uint8_t s2_push_time = 0;
+  uint8_t s1_state = HAL_GPIO_ReadPin(S1_GPIO_Port, S1_Pin);
+  uint8_t s2_state = HAL_GPIO_ReadPin(S2_GPIO_Port, S2_Pin);
   while (1)
   {
     /* USER CODE END WHILE */
@@ -118,8 +120,8 @@ int main(void)
 		  }
 		  last_task_time = HAL_GetTick();
 	  }
-	  //// DEBOUNCE TLACITKA
-	  if(HAL_GPIO_ReadPin(S1_GPIO_Port, S1_Pin) != s1_state)
+	  //// DEBOUNCE TLACITKA S1
+	  if(s1_state_change(s1_state))
 	  {
 		  s1_state = HAL_GPIO_ReadPin(S1_GPIO_Port, S1_Pin);
 		  if(!s1_push_time)
@@ -127,20 +129,15 @@ int main(void)
 			  s1_push_time = HAL_GetTick();
 		  }
 	  }
-	  if(s1_push_time && HAL_GetTick() - s1_push_time > DEBOUNCE_TIME)
+	  if(s1_is_released(s1_push_time))
 	  {
-		  if(HAL_GPIO_ReadPin(S1_GPIO_Port, S1_Pin) == GPIO_PIN_RESET)
-		  {
-			  if(s1_state == GPIO_PIN_RESET)
-			  {
-				  timer_started = !timer_started; //TODO when pressed
-			  }
-		  }
+		  timer_started = !timer_started;
 		  s1_push_time = 0;
 	  }
-	  //// DEBOUNCE TLACITKA
 
-	  if(HAL_GPIO_ReadPin(S2_GPIO_Port, S2_Pin) != s2_state)
+
+	  //// DEBOUNCE TLACITKA S2
+	  if(s2_state_change(s2_state))
 	  {
 		  s2_state = HAL_GPIO_ReadPin(S2_GPIO_Port, S2_Pin);
 		  if(!s2_push_time)
@@ -148,20 +145,11 @@ int main(void)
 			  s2_push_time = HAL_GetTick();
 		  }
 	  }
-	  if(s2_push_time && HAL_GetTick() - s2_push_time > DEBOUNCE_TIME)
+	  if(s2_is_released(s2_push_time))
 	  {
-		  if(HAL_GPIO_ReadPin(S2_GPIO_Port, S2_Pin) == GPIO_PIN_RESET)
-		  {
-			  if(s2_state == GPIO_PIN_RESET)
-			  {
-				  if(timer_started)
-				  {
-					  timer_started = 0;
-				  }
-				  seconds = 0;
-				  minutes = 0;
-			  }
-		  }
+		  timer_started = 0;
+		  seconds = 0;
+		  minutes = 0;
 		  s2_push_time = 0;
 	  }
 
@@ -301,7 +289,21 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+uint8_t s1_state_change(uint8_t state){
+	return HAL_GPIO_ReadPin(S1_GPIO_Port, S1_Pin) != state;
+}
 
+uint8_t s2_state_change(uint8_t state){
+	return HAL_GPIO_ReadPin(S2_GPIO_Port, S2_Pin) != state;
+}
+
+uint8_t s1_is_released(uint8_t push_time){
+	return (push_time && HAL_GetTick() - push_time > DEBOUNCE_TIME) && (HAL_GPIO_ReadPin(S1_GPIO_Port, S1_Pin) == GPIO_PIN_RESET);
+}
+
+uint8_t s2_is_released(uint8_t push_time){
+	return (push_time && HAL_GetTick() - push_time > DEBOUNCE_TIME) && (HAL_GPIO_ReadPin(S2_GPIO_Port, S2_Pin) == GPIO_PIN_RESET);
+}
 /* USER CODE END 4 */
 
 /**
